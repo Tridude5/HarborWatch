@@ -13,6 +13,11 @@ services:
       - "9200:9200"
     volumes:
       - osdata:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9200 >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
 
   dashboards:
     image: opensearchproject/opensearch-dashboards:2.14.0
@@ -22,7 +27,8 @@ services:
     ports:
       - "5601:5601"
     depends_on:
-      - opensearch
+      opensearch:
+        condition: service_healthy
 
   backend:
     build: ./backend
@@ -34,7 +40,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - opensearch
+      opensearch:
+        condition: service_healthy
 
   zeek:
     image: zeek/zeek:6.2.1
@@ -44,7 +51,8 @@ services:
       - ./zeek/run_zeek.sh:/run_zeek.sh:ro
     entrypoint: ["/bin/bash", "/run_zeek.sh"]
     depends_on:
-      - backend
+      backend:
+        condition: service_started
 
   vector:
     image: timberio/vector:0.38.0-alpine
@@ -52,8 +60,18 @@ services:
       - ./vector/vector.toml:/etc/vector/vector.toml:ro
       - ./logs/zeek:/logs:ro
     depends_on:
-      - backend
-      - zeek
+      backend:
+        condition: service_started
+      zeek:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_started
 
 volumes:
   osdata:
