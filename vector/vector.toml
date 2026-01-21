@@ -1,0 +1,24 @@
+[sources.zeek_logs]
+type = "file"
+include = ["/logs/*.log"]
+read_from = "beginning"
+ignore_older_secs = 0
+
+[transforms.only_json_lines]
+type = "remap"
+inputs = ["zeek_logs"]
+source = '''
+# Zeek JSON logs are 1 JSON object per line
+. = parse_json!(.message)
+# Keep source filename for event_type inference
+.source_file = .file
+'''
+
+[sinks.ingest_http]
+type = "http"
+inputs = ["only_json_lines"]
+uri = "http://backend:8000/ingest"
+method = "post"
+encoding.codec = "json"
+request.headers.Authorization = "Bearer devkey"
+healthcheck.enabled = true
