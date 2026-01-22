@@ -1,0 +1,54 @@
+# =========================
+# OS / Editor junk
+# =========================
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# =========================
+# Node / Frontend
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-error.log*
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.env
+.venv/
+venv/
+
+# =========================
+# Zeek / Runtime Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Docker
+# =========================
+*.tar
+*.pid
+
+# =========================
+# OpenSearch / Data volumes
+# =========================
+osdata/
+
+# =========================
+# Misc build artifacts
+# =========================
+coverage/
+dist/
+build/
